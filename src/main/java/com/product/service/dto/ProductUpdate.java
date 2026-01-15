@@ -1,11 +1,17 @@
 package com.product.service.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+@Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductUpdate {
     @Size(max = 100, message = "Name must not exceed 100 characters")
     private String name;

@@ -1,11 +1,17 @@
 package com.product.service.dto;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+@Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductRequest {
   @NotBlank(message = "Name is required")
   @Size(max = 100, message = "Name must not exceed 100 characters")
@@ -22,3 +28,13 @@ public class ProductRequest {
   @NotBlank(message = "Category is required")
   private String category;
 }
+/*
+*Builder --> para que la creacion de objetos se vea mas limpia
+* Antes
+* ProductRequest request = new ProductRequest();
+        request.setName("Bomba de baño");
+        request.setPrice(BigDecimal.valueOf(160));
+        request.setCategory("Higiene");
+*
+*
+* */
