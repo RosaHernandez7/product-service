@@ -57,7 +57,7 @@ public class ProductController {
         }
         return ResponseEntity.status(status).body(response);
     }
-
+// ex dummy
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long idProduct){
         productService.deleteProduct(idProduct);
