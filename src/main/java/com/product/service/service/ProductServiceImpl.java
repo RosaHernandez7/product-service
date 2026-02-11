@@ -3,9 +3,9 @@ package com.product.service.service;
 import com.product.service.dto.ProductRequest;
 import com.product.service.dto.ProductUpdate;
 import com.product.service.entity.Product;
-import com.product.service.exception.ExceptionBusiness;
+import com.product.service.exception.InvalidStockException;
+import com.product.service.exception.ProductNotFoundException;
 import com.product.service.repository.ProductDAO;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     public Product updateProduct(Long idProduct, ProductUpdate request) {
 
         Product product = productDAO.findById(idProduct).orElseThrow(
-                () -> new ExceptionBusiness("Product not found", HttpStatus.NOT_FOUND));
+                () -> new ProductNotFoundException("Product not found with id: "+ idProduct));
 
         Optional.ofNullable(request.getName())
                 .ifPresent(product::setName);
@@ -60,7 +60,7 @@ public class ProductServiceImpl implements ProductService {
         Optional.ofNullable(request.getStock()).ifPresent(delta -> {
             long newStock = product.getStock() + delta;
             if (newStock < 0) {
-                throw new ExceptionBusiness("Stock cannot be negative.", HttpStatus.BAD_REQUEST);
+                throw new InvalidStockException("Stock cannot be negative.");
             }
             product.setStock(newStock);
         });
@@ -71,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void deleteProduct(Long idProduct) {
         if (!productDAO.existsById(idProduct)) {
-            throw new ExceptionBusiness("Product not found", HttpStatus.NOT_FOUND);
+            throw new ProductNotFoundException("Product not found");
         }
         productDAO.deleteById(idProduct);
     }

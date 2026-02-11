@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.service.dto.ProductRequest;
 import com.product.service.dto.ProductUpdate;
 import com.product.service.entity.Product;
+import com.product.service.exception.ProductNotFoundException;
 import com.product.service.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -26,10 +28,10 @@ public class ProductControllerTest {
     MockMvc mockMvc; // simular el HTTP
 
     @MockBean
-    ProductService productService;
+    ProductService productService; //  Se crea una clase falsa
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper; //Para convertir a json
 
     @Test
     void shouldReturn201() throws Exception {
@@ -66,7 +68,7 @@ public class ProductControllerTest {
     @Test
     void shouldReturn400WhenNameisMissing() throws Exception {
         // No se usa mockito
-        //Valdar atributos obligatorios en ProductRequest
+        //Validar atributos obligatorios en ProductRequest
         ProductRequest request = ProductRequest.builder()
                 .price(BigDecimal.valueOf(160))
                 .category("Higiene")
@@ -83,6 +85,7 @@ public class ProductControllerTest {
 
     @Test
     void updateTest200() throws Exception {
+        //Validar que se actualiza correctamente un producto
         Product response = new Product();
         response.setCategory("face-cleansed");
         response.setPrice(BigDecimal.valueOf(100));
@@ -106,5 +109,26 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("$.category").value("face-cleansed"));
 
         verify(productService).updateProduct(eq(1L), any(ProductUpdate.class));
+    }
+
+   @Test
+    void notFound404() throws Exception {
+        ProductUpdate request = ProductUpdate.builder()
+                .price(BigDecimal.valueOf(100))
+                .category("face-cleansed")
+                .build();
+        //Simula lo que haria mi ProductServiceImpl, sino se encuentra el producto
+        doThrow(new ProductNotFoundException("Product not found"))
+                .when(productService)
+                .updateProduct(anyLong(),any(ProductUpdate.class));
+
+        // Act + Assert
+        //Simular la llamada HTTP
+        mockMvc.perform(patch("/products/{id}",9L)
+                        //.contentType("application/json")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isNotFound());
+        verify(productService).updateProduct(anyLong(),any(ProductUpdate.class));
     }
 }

@@ -26,7 +26,7 @@ public class ProductController {
         log.info("Product created successfully. id={}, name={}",
                 response.getIdProduct(), response.getName());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED) .body(response);
     }
 
     @GetMapping
