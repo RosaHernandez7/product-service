@@ -118,6 +118,7 @@ public class ProductControllerTest {
                 .category("face-cleansed")
                 .build();
         //Simula lo que haria mi ProductServiceImpl, sino se encuentra el producto
+       //El mensaje que se muestra en la siguiente linea debe coincidir con la leyenda  del andExpect
         doThrow(new ProductNotFoundException("Product not found"))
                 .when(productService)
                 .updateProduct(anyLong(),any(ProductUpdate.class));
@@ -128,7 +129,11 @@ public class ProductControllerTest {
                         //.contentType("application/json")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Not Found"))
+                .andExpect(jsonPath("$.error").value("Product not found"));
+
         verify(productService).updateProduct(anyLong(),any(ProductUpdate.class));
     }
 }

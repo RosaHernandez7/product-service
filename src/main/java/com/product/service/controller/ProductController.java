@@ -45,17 +45,12 @@ public class ProductController {
     @PatchMapping("/{id}")
     public ResponseEntity<Product> updateProduct(@PathVariable("id") Long idProduct,
                                                  @Valid @RequestBody ProductUpdate request){
-        Product response = new Product();
-        HttpStatus status = HttpStatus.OK;
-        try{
-            response =  productService.updateProduct(idProduct, request);
-            log.info("Product updated successfully. id={}",idProduct);
 
-        } catch (ExceptionBusiness e) {
-            status = e.getStatus();
-            log.error(e.getMessage(), e);
-        }
-        return ResponseEntity.status(status).body(response);
+        Product response = productService.updateProduct(idProduct, request);
+
+        log.info("Product updated successfully. id={}",idProduct);
+
+        return ResponseEntity.ok(response);
     }
 // ex dummy
     @DeleteMapping("/{id}")
@@ -66,3 +61,8 @@ public class ProductController {
     }
 
 }
+
+/**Si ya tienes GlobalExceptionHandler, entonces tu controller NO debe capturar la excepcion. (o sea sin try-catch)
+ *
+ */
+
